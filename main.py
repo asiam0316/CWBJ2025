@@ -74,6 +74,7 @@ if submitted:
 使用道具：{tools}
 使用乗り物：{vehicles}
 作業内容：{details}
+作業者：高齢者
 
 # 天候
 天気：{weather['condition']}
