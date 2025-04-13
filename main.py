@@ -79,7 +79,7 @@ if submitted:
 # 天候
 天気：{weather['condition']}
 気温：{weather['temperature']}
-天候不明の場合は{city}の現在の天候を検索してください。
+天候不明の場合は{city}の現在の天候を検索して表示してください。
 
 # 出力形式
 ・高齢者にわかりやすく具体的に
