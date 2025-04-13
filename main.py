@@ -4,7 +4,6 @@ load_dotenv(override=True)
 import os
 from utils.weather import get_weather
 from openai import AzureOpenAI
-import streamlit as st
 from datetime import date
 
 # --- .env読み込み ---
