@@ -1,40 +1,40 @@
 import requests
+from datetime import datetime
+import pytz
 
-def get_weather(city, subscription_key):
-    
-    url = "https://atlas.microsoft.com/search/address/json"
+def get_weather(city, today, api_key):
+    url = "https://api.openweathermap.org/data/2.5/forecast"
     params = {
-        "api-version": "1.0",
-        "subscription-key": subscription_key,
-        "query": city
+        "q": city,
+        "appid": api_key,
+        "lang": "ja",
+        "units": "metric"
     }
-    res = requests.get(url, params=params).json()
-    
-    if not res.get("results"):
-        return {"condition": "不明", "temperature": "不明"}
 
-    position = res["results"][0]["position"]
-    lat, lon = position["lat"], position["lon"]
+    response = requests.get(url, params=params)
+    response.raise_for_status()
+    data = response.json()
 
-    weather_url = f"https://atlas.microsoft.com/weather/currentConditions/json"
-    weather_params = {
-        "api-version": "1.0",
-        "subscription-key": subscription_key,
-        "query": f"{lat},{lon}",
-    #    "unit": "metric",
-        "language": "ja-jp"
-    }
-    weather_res = requests.get(weather_url, params=weather_params).json()
+    # 日本時間に変換
+    jst = pytz.timezone("Asia/Tokyo")
 
-    try:
-        condition = weather_res["results"][0]["phrases"]["phrase32char"]
-        temperature = f"{weather_res['results'][0]['temperature']['value']}℃"
-    except Exception:
-        condition = "取得失敗"
-        temperature = "不明"
+    # 結果格納リスト
+    today_forecast = []
 
-    return {
-        "city": city,
-        "condition": condition,
-        "temperature": temperature
-    }
+    for entry in data["list"]:
+        # 予報時間（UTC）をJSTに変換
+        dt_utc = datetime.utcfromtimestamp(entry["dt"])
+        dt_jst = dt_utc.replace(tzinfo=pytz.utc).astimezone(jst)
+
+        if dt_jst.date() == today:
+            forecast = {
+                "time": dt_jst.strftime("%H:%M"),
+                "weather": entry["weather"][0]["description"],
+                "temp": entry["main"]["temp"],
+                "humidity": entry["main"]["humidity"],
+                "wind_speed": entry["wind"]["speed"],
+                "rain_mm": entry.get("rain", {}).get("3h", 0.0)
+            }
+            today_forecast.append(forecast)
+
+    return today_forecast
