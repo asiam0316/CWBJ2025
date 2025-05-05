@@ -68,7 +68,7 @@ if submitted:
         st.warning("作業内容を入力してください。")
     else:
         # --- 天気を取得 ---
-        weather = get_weather(city, maps_key)
+        weather = get_weather(sidebar_city, maps_key)
         st.info(f"天気：{weather['condition']}　気温：{weather['temperature']}")
 
         # --- Azure OpenAI に送信するプロンプト ---
